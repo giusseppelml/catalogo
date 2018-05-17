@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">CATALOGO</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- login/registrarse -->
+    <string name="usuario_label">Usuario</string>
+    <string name="password_label">Contraseña</string>
+    <string name="correo_label">Correo</string>
+    <string name="switch_label">Recordar</string>
+    <string name="ingresar_label">Ingresar</string>
+    <string name="registrate_ahora_label">Registrate ahora</string>
+    <string name="registrarse_label">Registrarse</string>
+
+    <!-- productos -->
+    <string name="comprar_label">comprar</string>
+    <string name="carrito_label">carrito</string>
+    <string name="precio_label">precio: </string>
+
+    <!-- categoria -->
+    <string name="agregar_label">agregar</string>
+    <string name="editar_label">editar</string>
+    <string name="Escribe_titulo_label">Escribe un titulo</string>
+
+</resources>
