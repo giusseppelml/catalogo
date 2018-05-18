@@ -5,7 +5,7 @@ class Conexion{
 	public function conectar(){
 
 		$localhost = "localhost";
-		$database = "curso";
+		$database = "tienda_curso";
 		$user = "root";
 		$password = "";
 

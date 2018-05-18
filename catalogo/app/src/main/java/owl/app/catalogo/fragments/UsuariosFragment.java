@@ -145,10 +145,16 @@ public class UsuariosFragment extends Fragment {
         mAdapter = new UsuariosAdapter(usuariosList, R.layout.card_view_usuarios, new UsuariosAdapter.OnClickListener() {
             @Override
             public void onItemClick(Usuarios usuarios, int position) {
-                Intent intent = new Intent(getContext(), VentasEspecificasActivity.class);
-                intent.putExtra("id", usuarios.getId());
-                startActivity(intent);
-                getActivity().overridePendingTransition(R.anim.zoom_forward_in, R.anim.zoom_forward_out);
+
+                if(usuarios.getRole().equals("administrador")){
+                    Toast.makeText(getContext(), "Haz dado click en el usuario: " + usuarios.getUsuario(),
+                            Toast.LENGTH_SHORT).show();
+                }else{
+                    Intent intent = new Intent(getContext(), VentasEspecificasActivity.class);
+                    intent.putExtra("id", usuarios.getId());
+                    startActivity(intent);
+                    getActivity().overridePendingTransition(R.anim.zoom_forward_in, R.anim.zoom_forward_out);
+                }
             }
         });
 

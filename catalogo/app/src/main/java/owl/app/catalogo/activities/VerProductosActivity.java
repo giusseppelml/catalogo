@@ -49,8 +49,6 @@ public class VerProductosActivity extends AppCompatActivity implements View.OnCl
     private double keyCosto;
 
     private boolean verificarDeseo = false;
-    private int positionDeseo = 0;
-    private Deseos objDeseo;
 
     //------------------------------------
     //aqui empieza el carrito con realm
@@ -93,15 +91,9 @@ public class VerProductosActivity extends AppCompatActivity implements View.OnCl
         for (int i = 0; i < deseosList.size() ; i++) {
             if(keyID == deseosList.get(i).getIdeWeb()){
                 Picasso.get().load(R.drawable.deseo_activo).into(imagenDeseo);
-                positionDeseo = deseosList.get(i).getId() - 1;
                 verificarDeseo = true;
                 break;
             }
-        }
-
-        for (int i = 0; i < deseosList.size() ; i++) {
-            Toast.makeText(VerProductosActivity.this, "id: " + deseosList.get(i).getId()
-            + "\n producto: " + deseosList.get(i).getProducto(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -177,13 +169,6 @@ public class VerProductosActivity extends AppCompatActivity implements View.OnCl
         Toast.makeText(VerProductosActivity.this, "producto agregado a tu lista de deseos", Toast.LENGTH_SHORT).show();
     }
 
-    private void eliminarDeseo(Deseos deseos){
-        realm.beginTransaction();
-        deseos.deleteFromRealm();
-        realm.commitTransaction();
-        Picasso.get().load(R.drawable.deseo_apagado).into(imagenDeseo);
-    }
-
 
     @Override
     public void onBackPressed() {
@@ -217,7 +202,8 @@ public class VerProductosActivity extends AppCompatActivity implements View.OnCl
                 if(SharedPrefManager.getInstance(VerProductosActivity.this).isLoggedIn()
                         && SharedPrefManager.getInstance(VerProductosActivity.this).getUser().getRole().equals("cliente")){
                     if(verificarDeseo){
-                        eliminarDeseo(objDeseo);
+                        startActivity(new Intent(VerProductosActivity.this, PerfilActivity.class));
+                        overridePendingTransition(R.anim.left_in, R.anim.zoom_back_out);
                     }else {
                         agregarProductoADeseos(keyID, keyTitulo, keyImagen, keyCosto);
                     }

@@ -30,7 +30,8 @@ public class PerfilActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout)findViewById(R.id.tabLayoutPerfil);
         tabLayout.addTab(tabLayout.newTab().setText("Perfil"));
-        tabLayout.addTab(tabLayout.newTab().setText("Compras"));
+        tabLayout.addTab(tabLayout.newTab().setIcon(R.mipmap.ic_venta_on));
+        tabLayout.addTab(tabLayout.newTab().setText("Deseos"));
         tabLayout.setTabGravity(tabLayout.GRAVITY_FILL);
 
         // este si se realiza en activity: getSupportFragmentManager();

@@ -227,7 +227,7 @@ if (isset($_GET['apicall'])) {
             break;
 
         //la operación DELETE
-        case 'deletecategoria': //*
+        case 'deletecategoria': // *
             #RUTA PARA HACER PRUEBA EN POSTMAN: http://localhost/json-curso/Api.php?apicall=deletecategoria&id=(ID QUE DESEAS ELIMINAR)
             if (isset($_GET['id']) && !empty($_GET['id'])) {
                 $db = new ControllerJson();
@@ -249,7 +249,7 @@ if (isset($_GET['apicall'])) {
     //-----------------------------------------------------------------------------------------------------
     #VENTAS
 
-            case 'createventa': //*
+            case 'createventa': // *
             #RUTA PARA HACER PRUEBA EN POSTMAN: http://localhost/json-curso/api.php?apicall=createventa
 
             isTheseParametersAvailable(array('usuarios', 'producto', 'imagen', 'costo', 'fecha'));
@@ -275,7 +275,7 @@ if (isset($_GET['apicall'])) {
             break;
 
         // la operación READ
-        case 'readventas': //*
+        case 'readventas': // *
             #RUTA PARA HACER PRUEBA EN POSTMAN: http://localhost/json-curso/Api.php?apicall=readventas
             $db                    = new ControllerJson();
             $response['error']     = false;
@@ -283,7 +283,7 @@ if (isset($_GET['apicall'])) {
             $response['contenido'] = $db->readVentasController();
             break;
 
-            case 'readventaespecifica': //*
+            case 'readventaespecifica': // *
             #RUTA PARA HACER PRUEBA EN POSTMAN: http://localhost/json-curso/Api.php?apicall=readventaespecifica&usuario=(ID CON EL QUE DESEA REALIZAR LA BUSQUEDA)
 
             if (isset($_GET['usuario']) && !empty($_GET['usuario'])) {

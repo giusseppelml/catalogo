@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import owl.app.catalogo.fragments.DeseosFragment;
 import owl.app.catalogo.fragments.MisComprasFragment;
 import owl.app.catalogo.fragments.PerfilFragment;
 
@@ -25,6 +26,8 @@ public class PagerPerfilAdapter extends FragmentStatePagerAdapter {
                 return new PerfilFragment();
             case 1:
                 return new MisComprasFragment();
+            case 2:
+                return new DeseosFragment();
             default:
                 return null;
         }

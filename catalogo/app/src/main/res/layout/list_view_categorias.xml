@@ -17,7 +17,7 @@
             android:layout_height="match_parent"
             android:layout_weight="0.20"
             android:layout_margin="5dp"
-            android:src="@android:drawable/star_big_on"/>
+            android:src="@mipmap/ic_lista_categoria"/>
 
         <TextView
             android:id="@+id/textViewCategoria"

@@ -1,6 +1,8 @@
 package owl.app.catalogo.fragments;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -25,13 +27,14 @@ import owl.app.catalogo.R;
 import owl.app.catalogo.api.Api;
 import owl.app.catalogo.api.RequestHandler;
 import owl.app.catalogo.models.Carrito;
+import owl.app.catalogo.models.Deseos;
 import owl.app.catalogo.models.Ventas;
 import owl.app.catalogo.utils.SharedPrefManager;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PerfilFragment extends Fragment {
+public class PerfilFragment extends Fragment implements View.OnClickListener{
 
     private TextView perfilNombre;
     private TextView contadorListaCarrito;
@@ -44,6 +47,7 @@ public class PerfilFragment extends Fragment {
 
     private Realm realm;
     private RealmResults<Carrito> carritoList;
+    private RealmResults<Deseos> deseosList;
 
     private List<Ventas> ventasList;
 
@@ -63,12 +67,14 @@ public class PerfilFragment extends Fragment {
 
         ventasList = new ArrayList<>();
 
-        //Toast.makeText(getContext(), "cantidad de productos comprados: " + ventasList.size(), Toast.LENGTH_LONG).show();
-
         readVentas(SharedPrefManager.getInstance(getContext()).getUser().getId());
 
         perfilNombre.setText(SharedPrefManager.getInstance(getContext()).getUser().getUsuario());
-        contadorListaCarrito.setText(contadorProductos());
+        contadorListaCarrito.setText(contadorProductos(true));
+        contadorListaDeseos.setText(contadorProductos(false));
+
+        fabDeseos.setOnClickListener(this);
+        fabCarrito.setOnClickListener(this);
 
         return view;
     }
@@ -80,14 +86,24 @@ public class PerfilFragment extends Fragment {
         montoTotalProductos = (TextView)view.findViewById(R.id.textViewPerfilMontoProducto);
         cantidadTotalProductos = (TextView)view.findViewById(R.id.textViewPerfilCantidadProducto);
 
+        fabCarrito = (FloatingActionButton)view.findViewById(R.id.fabPerfilCarrito);
+        fabDeseos = (FloatingActionButton)view.findViewById(R.id.fabPerfilDeseos);
+
         realm = Realm.getDefaultInstance();
         carritoList = realm.where(Carrito.class).findAll();
+        deseosList = realm.where(Deseos.class).findAll();
     }
 
-    public String contadorProductos(){
-        String resultado = (carritoList.size() == 1) ? "producto":"productos";
-        String texto = carritoList.size()+ " " + resultado;
-        return texto;
+    public String contadorProductos(boolean verificar){
+        if(verificar){
+            String resultado = (carritoList.size() == 1) ? "producto":"productos";
+            String texto = carritoList.size()+ " " + resultado;
+            return texto;
+        }else {
+            String resultado = (deseosList.size() == 1) ? "producto":"productos";
+            String texto = deseosList.size()+ " " + resultado;
+            return texto;
+        }
     }
 
     public String contadorProductosVendidos(List<Ventas> ventas){
@@ -109,7 +125,8 @@ public class PerfilFragment extends Fragment {
     }
 
     private void readVentas(int id) {
-        PerformNetworkRequest request = new PerformNetworkRequest(Api.URL_READ_VENTAS_ESPECIFICAS + id, null, Api.CODE_GET_REQUEST);
+        PerformNetworkRequest request = new PerformNetworkRequest(Api.URL_READ_VENTAS_ESPECIFICAS + id,
+                null, Api.CODE_GET_REQUEST);
         request.execute();
     }
 
@@ -139,6 +156,104 @@ public class PerfilFragment extends Fragment {
         cantidadTotalProductos.setText(contadorProductosVendidos(ventasList));
         montoTotalProductos.setText(montoTotal());
 
+    }
+
+    private String costoTotal(boolean verificar){
+        double total = 0;
+        if(verificar){
+            for (int position = 0; position < carritoList.size() ; position++) {
+                total += carritoList.get(position).getCosto();
+            }
+        }else{
+            for (int position = 0; position < deseosList.size() ; position++) {
+                total += deseosList.get(position).getCosto();
+            }
+        }
+
+        String respuesta = String.valueOf(total);
+        return respuesta;
+    }
+
+    private void showInfoAlertComprarAll(final boolean verificar) {
+        new AlertDialog.Builder(getContext())
+                .setTitle("Todos los productos serán comprados!!!")
+                .setMessage("el costo será de: $"+ costoTotal(verificar) + " pesos, Quieres Continuar?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        if(verificar){
+                            for (int position = 0; position < carritoList.size() ; position++) {
+                                createVenta(carritoList.get(position).getProducto(),
+                                        carritoList.get(position).getImagen(),
+                                        carritoList.get(position).getCosto());
+                            }
+                        }else{
+                            for (int position = 0; position < deseosList.size() ; position++) {
+                                createVenta(deseosList.get(position).getProducto(),
+                                        deseosList.get(position).getImagen(),
+                                        deseosList.get(position).getCosto());
+                            }
+                        }
+
+
+                        Toast.makeText(getContext(), "Compra Realizada", Toast.LENGTH_LONG).show();
+
+                        if (verificar){
+                            realm.beginTransaction();
+                            carritoList.deleteAllFromRealm();
+                            realm.commitTransaction();
+                            contadorListaCarrito.setText("0 productos");
+                        }else{
+                            realm.beginTransaction();
+                            deseosList.deleteAllFromRealm();
+                            realm.commitTransaction();
+                            contadorListaDeseos.setText("0 productos");
+                        }
+
+                    }
+                })
+                .setNegativeButton("CANCEL", null)
+                .show();
+    }
+
+    private void createVenta(String productos, String imagenes, double costos) {
+        String usurioConversion = String.valueOf(SharedPrefManager.getInstance(getContext()).getUser().getId());
+        String titulos = productos;
+        String imagen = imagenes;
+        String precios = String.valueOf(costos);
+        String fecha = "2020-04-24 00:00:00";
+
+
+        //en params.put en el estring va la llave exactamente como lo exige el api en php
+        HashMap<String, String> params = new HashMap<>();
+        params.put("usuarios", usurioConversion);
+        params.put("producto", titulos);
+        params.put("imagen", imagen);
+        params.put("costo", precios);
+        params.put("fecha", fecha);
+
+        PerformNetworkRequest request = new PerformNetworkRequest(Api.URL_CREATE_VENTAS, params, Api.CODE_POST_REQUEST);
+        request.execute();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.fabPerfilCarrito:
+                if (carritoList.isEmpty())
+                    Toast.makeText(getContext(), "no hay nada en tu carrito", Toast.LENGTH_SHORT).show();
+                else
+                    showInfoAlertComprarAll(true);
+                break;
+            case R.id.fabPerfilDeseos:
+                if (deseosList.isEmpty())
+                    Toast.makeText(getContext(), "no hay nada en tu lista de deseos", Toast.LENGTH_SHORT).show();
+                else
+                    showInfoAlertComprarAll(false);
+                break;
+
+        }
     }
 
 
